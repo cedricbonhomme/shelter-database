@@ -20,7 +20,7 @@ __license__ = ""
 from threading import Thread
 from functools import wraps
 
-def async(f):
+def async_f(f):
     """
     This decorator enables to launch a task (for examle sending an email or
     indexing the database) in background.

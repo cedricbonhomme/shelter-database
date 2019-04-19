@@ -25,7 +25,7 @@ from email.mime.text import MIMEText
 #from postmark import PMMail
 
 import conf
-from web.decorators import async
+from web.decorators import async_f
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +39,7 @@ def send(*args, **kwargs):
     else:
         send_smtp(**kwargs)
 
-@async
+@async_f
 def send_smtp(to="", bcc="", subject="", plaintext=""):
     """
     Send an email.
