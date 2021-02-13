@@ -1,5 +1,4 @@
 [tool.poetry]
-<<<<<<< HEAD
 name = "shelter-database"
 version = "0.3"
 description = "Shelter Database"
@@ -13,31 +12,10 @@ SQLAlchemy = "^1.3.23"
 alembic = "^1.5.4"
 Flask = "^1.1.2"
 Flask-SQLAlchemy = "^2.4.4"
-=======
-name = "shelter"
-version = "0.3"
-description = "List the shelters deployed around the world."
-authors = ["Cédric Bonhomme <cedric@cedricbonhomme.org>"]
-license = "MIT"
-
-readme = "README.md"
-
-homepage = "https://github.com/cedricbonhomme/shelter-database"
-repository = "https://github.com/cedricbonhomme/shelter-database"
-
-[tool.poetry.dependencies]
-python = "^3.7"
-psycopg2-binary = "^2.8.4"
-SQLAlchemy = "^1.3.13"
-alembic = "^1.4.0"
-Flask = "^1.1.1"
-Flask-SQLAlchemy = "^2.4.1"
->>>>>>> d71490dde1caa034ad9b2544b4092d34987e3500
 Flask-Restless = "^0.17.0"
 Flask-Login = "^0.5.0"
 Flask-WTF = "^0.14.3"
 Flask-Script = "^2.0.6"
-<<<<<<< HEAD
 Flask-Admin = "^1.5.7"
 Flask-Principal = "^0.4.0"
 Flask-Babel = "^2.0.0"
@@ -49,27 +27,9 @@ jsmin = "^2.2.2"
 Pillow = "^8.1.0"
 requests = "^2.25.1"
 WeasyPrint = "^52.2"
-=======
-Flask-Admin = "^1.5.5"
-Flask-Principal = "^0.4.0"
-Flask-Babel = "^1.0.0"
-Flask-Migrate = "^2.5.2"
-Flask-thumbnails = "^1.0.6"
-Flask-Assets = "^2.0"
-cssmin = "^0.2.0"
-jsmin = "^2.2.2"
-Pillow = "^7.0.0"
-requests = "^2.22.0"
-weasyprint = "^51"
->>>>>>> d71490dde1caa034ad9b2544b4092d34987e3500
 
 [tool.poetry.dev-dependencies]
 
 [build-system]
-<<<<<<< HEAD
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
-=======
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
->>>>>>> d71490dde1caa034ad9b2544b4092d34987e3500
