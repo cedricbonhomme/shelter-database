@@ -23,6 +23,8 @@ eproject.cfg
 venv
 build
 
+shelter.egg-info
+
 # node files
 node_modules
 src/web/static/lib/npm_components
