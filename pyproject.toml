@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "shelter-database"
+version = "0.3"
+description = "Shelter Database"
+authors = ["Cédric Bonhomme <cedric@cedricbonhomme.org>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+psycopg2-binary = "^2.8.6"
+SQLAlchemy = "^1.3.23"
+alembic = "^1.5.4"
+Flask = "^1.1.2"
+Flask-SQLAlchemy = "^2.4.4"
+Flask-Restless = "^0.17.0"
+Flask-Login = "^0.5.0"
+Flask-WTF = "^0.14.3"
+Flask-Script = "^2.0.6"
+Flask-Admin = "^1.5.7"
+Flask-Principal = "^0.4.0"
+Flask-Babel = "^2.0.0"
+Flask-Migrate = "^2.6.0"
+Flask-thumbnails = "^1.0.7"
+Flask-Assets = "^2.0"
+cssmin = "^0.2.0"
+jsmin = "^2.2.2"
+Pillow = "^8.1.0"
+requests = "^2.25.1"
+WeasyPrint = "^52.2"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
