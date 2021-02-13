@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # ***** BEGIN LICENSE BLOCK *****
 # This file is part of Shelter Database.
@@ -20,21 +20,34 @@ __license__ = ""
 import logging
 import datetime
 from werkzeug import generate_password_hash
-from flask import (render_template, flash, session, request,
-                   url_for, redirect, current_app, g)
-from flask_login import LoginManager, logout_user, \
-                            login_required, current_user
-from flask_principal import (Principal, AnonymousIdentity, UserNeed,
-                                 identity_changed, identity_loaded,
-                                 session_identity_loader)
+from flask import (
+    render_template,
+    flash,
+    session,
+    request,
+    url_for,
+    redirect,
+    current_app,
+    g,
+)
+from flask_login import LoginManager, logout_user, login_required, current_user
+from flask_principal import (
+    Principal,
+    AnonymousIdentity,
+    UserNeed,
+    identity_changed,
+    identity_loaded,
+    session_identity_loader,
+)
 
 import conf
 from bootstrap import db
 from web.views.common import admin_role, login_user_bundle
 from web.models import User
-from web.forms import LoginForm #, SignupForm
+from web.forms import LoginForm  # , SignupForm
 from web.lib.utils import HumanitarianId
-#from notifications import notifications
+
+# from notifications import notifications
 
 Principal(current_app)
 # Create a permission with a single Need, in this case a RoleNeed.
@@ -43,9 +56,10 @@ login_manager = LoginManager()
 login_manager.init_app(current_app)
 login_manager.login_message = u"Please log in to access this page."
 login_manager.login_message_category = "warning"
-login_manager.login_view = 'login'
+login_manager.login_view = "login"
 
 logger = logging.getLogger(__name__)
+
 
 @identity_loaded.connect_via(current_app._get_current_object())
 def on_identity_loaded(sender, identity):
@@ -58,9 +72,11 @@ def on_identity_loaded(sender, identity):
         if current_user.is_admin:
             identity.provides.add(admin_role)
 
+
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.filter(User.id==user_id, User.is_active==True).first()
+    return User.query.filter(User.id == user_id, User.is_active == True).first()
+
 
 @current_app.before_request
 def before_request():
@@ -70,73 +86,73 @@ def before_request():
         db.session.commit()
 
 
-@current_app.route('/login', methods=['GET'])
+@current_app.route("/login", methods=["GET"])
 def join():
     if current_user.is_authenticated or HumanitarianId().login():
-        return redirect(url_for('index'))
+        return redirect(url_for("index"))
     form = LoginForm()
-    #signup = SignupForm()
+    # signup = SignupForm()
     return render_template(
-            'login.html',
-            humanitarian_id_auth_uri=conf.HUMANITARIAN_ID_AUTH_URI,
-            client_id=conf.HUMANITARIAN_ID_CLIENT_ID,
-            redirect_uri=conf.HUMANITARIAN_ID_REDIRECT_URI,
-            loginForm=form #, signupForm=signup
-            )
+        "login.html",
+        humanitarian_id_auth_uri=conf.HUMANITARIAN_ID_AUTH_URI,
+        client_id=conf.HUMANITARIAN_ID_CLIENT_ID,
+        redirect_uri=conf.HUMANITARIAN_ID_REDIRECT_URI,
+        loginForm=form,  # , signupForm=signup
+    )
 
 
-@current_app.route('/login', methods=['POST'])
+@current_app.route("/login", methods=["POST"])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for("index"))
     form = LoginForm()
     if form.validate_on_submit():
-        flash('You are logged in', 'info')
+        flash("You are logged in", "info")
         login_user_bundle(form.user)
-        return form.redirect('index')
-    #signup = SignupForm()
+        return form.redirect("index")
+    # signup = SignupForm()
     return render_template(
-            'login.html',
-            humanitarian_id_auth_uri=conf.HUMANITARIAN_ID_AUTH_URI,
-            client_id=conf.HUMANITARIAN_ID_CLIENT_ID,
-            redirect_uri=conf.HUMANITARIAN_ID_REDIRECT_URI,
-            loginForm=form #, signupForm=signup
-            )
+        "login.html",
+        humanitarian_id_auth_uri=conf.HUMANITARIAN_ID_AUTH_URI,
+        client_id=conf.HUMANITARIAN_ID_CLIENT_ID,
+        redirect_uri=conf.HUMANITARIAN_ID_REDIRECT_URI,
+        loginForm=form,  # , signupForm=signup
+    )
 
 
-@current_app.route('/callback/humanitarianid', methods=['GET'])
+@current_app.route("/callback/humanitarianid", methods=["GET"])
 def login_humanitarianid():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    access_token = request.values.get('access_token', None)
+        return redirect(url_for("index"))
+    access_token = request.values.get("access_token", None)
     if access_token:
-        session['hid_access_token'] = access_token
-        return redirect(url_for('join'))
-    return render_template('humanitarianid_login.html')
+        session["hid_access_token"] = access_token
+        return redirect(url_for("join"))
+    return render_template("humanitarianid_login.html")
 
 
-@current_app.route('/logout')
+@current_app.route("/logout")
 @login_required
 def logout():
     # Remove the user information from the session
     logout_user()
-    flash('You are logged out', 'warning')
+    flash("You are logged out", "warning")
 
     # Remove session keys set by Flask-Principal
-    for key in ('identity.name', 'identity.auth_type', 'hid_access_token'):
+    for key in ("identity.name", "identity.auth_type", "hid_access_token"):
         session.pop(key, None)
 
     # Tell Flask-Principal the user is anonymous
     identity_changed.send(current_app, identity=AnonymousIdentity())
     session_identity_loader()
 
-    if request.values.get('hid_logout'):
-        return redirect(conf.HUMANITARIAN_ID_AUTH_URI+'/logout')
-    return redirect(url_for('index'))
+    if request.values.get("hid_logout"):
+        return redirect(conf.HUMANITARIAN_ID_AUTH_URI + "/logout")
+    return redirect(url_for("index"))
 
 
-#@current_app.route('/signup', methods=['POST'])
-#def signup():
+# @current_app.route('/signup', methods=['POST'])
+# def signup():
 #    """if not conf.SELF_REGISTRATION:
 #        flash("Self-registration is disabled.", 'warning')
 #        return redirect(url_for('index'))"""

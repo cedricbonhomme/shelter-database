@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # ***** BEGIN LICENSE BLOCK *****
 # This file is part of Shelter Database.
@@ -20,25 +20,28 @@ __license__ = ""
 from sqlalchemy import desc, event
 from bootstrap import db
 
+
 class Value(db.Model):
     """
     Represent a value of an attribute.
     """
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(), nullable=False)
 
     # relationship
-    attribute_id = db.Column(db.Integer, db.ForeignKey('attribute.id'), nullable=False)
+    attribute_id = db.Column(db.Integer, db.ForeignKey("attribute.id"), nullable=False)
 
-    #properties = db.relationship('Property', backref='value', lazy='dynamic',
-                                #cascade='all, delete-orphan',
-                                #order_by=desc('Property.id'))
+    # properties = db.relationship('Property', backref='value', lazy='dynamic',
+    # cascade='all, delete-orphan',
+    # order_by=desc('Property.id'))
 
     def __str__(self):
         """
         Required for administrative interface.
         """
         return str(self.id)
+
 
 """
 def my_after_update_listener(mapper, connection, target):

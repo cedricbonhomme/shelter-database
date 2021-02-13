@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # ***** BEGIN LICENSE BLOCK *****
 # This file is part of Shelter Database.
@@ -25,6 +25,7 @@ with app.app_context():
 
     # HTML views
     from web import views
+
     app.register_blueprint(views.user_bp)
     app.register_blueprint(views.shelter_bp)
     app.register_blueprint(views.shelters_bp)
@@ -51,7 +52,9 @@ with app.app_context():
 extra_files = []
 if conf.WEBSERVER_DEBUG:
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    extra_dirs = ['src/web/templates/', ]
+    extra_dirs = [
+        "src/web/templates/",
+    ]
     for extra_dir in extra_dirs:
         for dirname, dirs, files in os.walk(os.path.join(BASE_DIR, extra_dir)):
             for dir in dirs:
@@ -62,7 +65,9 @@ if conf.WEBSERVER_DEBUG:
                     extra_files.append(filename)
 
 if __name__ == "__main__":
-    app.run(host=conf.WEBSERVER_HOST,
-            port=conf.WEBSERVER_PORT,
-            debug=conf.WEBSERVER_DEBUG,
-            extra_files=extra_files)
+    app.run(
+        host=conf.WEBSERVER_HOST,
+        port=conf.WEBSERVER_PORT,
+        debug=conf.WEBSERVER_DEBUG,
+        extra_files=extra_files,
+    )

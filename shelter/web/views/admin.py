@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # ***** BEGIN LICENSE BLOCK *****
 # This file is part of Shelter Database.
@@ -29,43 +29,49 @@ from flask_admin.menu import MenuLink
 from bootstrap import db
 from web.models import User, Shelter, Value, Translation
 
+
 class TranslationView(ModelView):
-    column_searchable_list = ('original', 'translated')
-    column_filters = ['language_code']
-    column_editable_list = ['translated']
+    column_searchable_list = ("original", "translated")
+    column_filters = ["language_code"]
+    column_editable_list = ["translated"]
+
     def is_accessible(self):
         return current_user.is_authenticated and current_user.is_admin
+
 
 class ValueView(ModelView):
-    column_searchable_list = ('name',)
-    column_filters = ['attribute_id']
+    column_searchable_list = ("name",)
+    column_filters = ["attribute_id"]
+
     def is_accessible(self):
         return current_user.is_authenticated and current_user.is_admin
+
 
 class UserView(ModelView):
-    column_exclude_list = ['pwdhash']
-    column_editable_list = ['email', 'name']
+    column_exclude_list = ["pwdhash"]
+    column_editable_list = ["email", "name"]
+
     def is_accessible(self):
         return current_user.is_authenticated and current_user.is_admin
+
 
 class ShelterView(ModelView):
-    column_exclude_list = ['properties']
-    form_excluded_columns = ['properties']
+    column_exclude_list = ["properties"]
+    form_excluded_columns = ["properties"]
+
     def is_accessible(self):
         return current_user.is_authenticated and current_user.is_admin
 
-menu_link_back_dashboard = MenuLink(name='Back to dashboard',
-                                url='/admin/dashboard')
-menu_link_back_home = MenuLink(name='Back to home',
-                                url='/')
 
-admin = Admin(current_app,
-                name='Management of data',
-                template_mode='bootstrap3',
-                index_view=AdminIndexView(
-                        name='Home',
-                        url='/admin/data_management'
-                    ))
+menu_link_back_dashboard = MenuLink(name="Back to dashboard", url="/admin/dashboard")
+menu_link_back_home = MenuLink(name="Back to home", url="/")
+
+admin = Admin(
+    current_app,
+    name="Management of data",
+    template_mode="bootstrap3",
+    index_view=AdminIndexView(name="Home", url="/admin/data_management"),
+)
 admin.add_view(UserView(User, db.session))
 admin.add_view(ShelterView(Shelter, db.session))
 admin.add_view(ValueView(Value, db.session))

@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # ***** BEGIN LICENSE BLOCK *****
 # This file is part of Shelter Database.
@@ -19,25 +19,33 @@ __license__ = ""
 
 from flask_wtf import Form
 from flask import url_for, redirect, flash
-from wtforms import validators, TextField, BooleanField, PasswordField, \
-                    SubmitField
+from wtforms import validators, TextField, BooleanField, PasswordField, SubmitField
 from flask_wtf.html5 import EmailField
 
 from web.models import User
+
 
 class CreateUserForm(Form):
     """
     Create a user (for the administrator).
     """
-    name = TextField("Name",
-            [validators.Required("Please enter your name.")])
-    email = EmailField("Email",
-                [validators.Length(min=6, max=35),
-                validators.Required("Please enter an email.")])
+
+    name = TextField("Name", [validators.Required("Please enter your name.")])
+    email = EmailField(
+        "Email",
+        [
+            validators.Length(min=6, max=35),
+            validators.Required("Please enter an email."),
+        ],
+    )
     is_admin = BooleanField("Admin")
-    password = PasswordField("Password",
-                [validators.Length(min=6, max=100),
-                validators.Required("Please enter a password.")])
+    password = PasswordField(
+        "Password",
+        [
+            validators.Length(min=6, max=100),
+            validators.Required("Please enter a password."),
+        ],
+    )
     organization = TextField("Organization")
     submit = SubmitField("Save")
 
@@ -45,24 +53,30 @@ class CreateUserForm(Form):
         validated = super(CreateUserForm, self).validate()
         if self.name.data != User.make_valid_name(self.name.data):
             self.name.errors.append(
-                    'This name has invalid characters. '
-                    'Please use letters, numbers, dots and underscores only.')
+                "This name has invalid characters. "
+                "Please use letters, numbers, dots and underscores only."
+            )
             validated = False
-        user = User.query.filter(User.email==self.email.data).first()
+        user = User.query.filter(User.email == self.email.data).first()
         if user:
-            self.email.errors.append('This email is already used.')
+            self.email.errors.append("This email is already used.")
             validated = False
         return validated
+
 
 class EditUserForm(Form):
     """
     Edit a user (for the administrator).
     """
-    name = TextField("Name",
-            [validators.Required("Please enter your name.")])
-    email = EmailField("Email",
-                [validators.Length(min=6, max=35),
-                validators.Required("Please enter an email.")])
+
+    name = TextField("Name", [validators.Required("Please enter your name.")])
+    email = EmailField(
+        "Email",
+        [
+            validators.Length(min=6, max=35),
+            validators.Required("Please enter an email."),
+        ],
+    )
     is_admin = BooleanField("Admin")
     organization = TextField("Organization")
     password = PasswordField("Password")
@@ -72,7 +86,8 @@ class EditUserForm(Form):
         validated = super(EditUserForm, self).validate()
         if self.name.data != User.make_valid_name(self.name.data):
             self.name.errors.append(
-                    'This name has invalid characters. '
-                    'Please use letters, numbers, dots and underscores only.')
+                "This name has invalid characters. "
+                "Please use letters, numbers, dots and underscores only."
+            )
             validated = False
         return validated

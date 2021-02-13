@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # ***** BEGIN LICENSE BLOCK *****
 # This file is part of Shelter Database.
@@ -19,16 +19,16 @@ __license__ = ""
 
 from bootstrap import db
 
+
 class ShelterPicture(db.Model):
     """
     Represent a picture for a shelter.
     """
+
     id = db.Column(db.Integer, primary_key=True)
-    file_name = db.Column(db.String(), default='')
+    file_name = db.Column(db.String(), default="")
     is_main_picture = db.Column(db.Boolean(), default=False)
 
     # relationship
-    shelter_id = db.Column(db.Integer, db.ForeignKey('shelter.id'),
-                            nullable=False)
-    category_id = db.Column(db.Integer, db.ForeignKey('category.id'),
-                            nullable=False)
+    shelter_id = db.Column(db.Integer, db.ForeignKey("shelter.id"), nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey("category.id"), nullable=False)

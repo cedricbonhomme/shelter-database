@@ -22,27 +22,39 @@ from flask import render_template
 import conf
 from web.notifications import emails
 
+
 def new_account_creation(user):
     """
     Account creation notification.
     """
-    plaintext = render_template('emails/account_creation.txt',
-                                user=user, platform_url=conf.PLATFORM_URL)
-    emails.send(to=user.email,
-                bcc=conf.NOTIFICATION_EMAIL,
-                subject="[Shelter Database] Account creation",
-                plaintext=plaintext)
+    plaintext = render_template(
+        "emails/account_creation.txt", user=user, platform_url=conf.PLATFORM_URL
+    )
+    emails.send(
+        to=user.email,
+        bcc=conf.NOTIFICATION_EMAIL,
+        subject="[Shelter Database] Account creation",
+        plaintext=plaintext,
+    )
+
 
 def new_shelter_creation(shelter, user):
     """
     Shelter creation notification.
     """
     from web.models import User
-    admins = User.query.filter(User.is_admin==True).all()
+
+    admins = User.query.filter(User.is_admin == True).all()
     recipients = ", ".join([user.email for user in admins])
-    plaintext = render_template('emails/shelter_creation.txt',
-                                shelter=shelter, user=user, platform_url=conf.PLATFORM_URL)
-    emails.send(to=recipients,
-                bcc=conf.NOTIFICATION_EMAIL,
-                subject="[Shelter Database] Shelter creation",
-                plaintext=plaintext)
+    plaintext = render_template(
+        "emails/shelter_creation.txt",
+        shelter=shelter,
+        user=user,
+        platform_url=conf.PLATFORM_URL,
+    )
+    emails.send(
+        to=recipients,
+        bcc=conf.NOTIFICATION_EMAIL,
+        subject="[Shelter Database] Shelter creation",
+        plaintext=plaintext,
+    )

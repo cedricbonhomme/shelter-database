@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # ***** BEGIN LICENSE BLOCK *****
 # This file is part of Shelter Database.
@@ -25,33 +25,33 @@ from bootstrap import db
 #     db.Column('value_id', db.Integer, db.ForeignKey('value.id'))
 # )
 
+
 class Association(db.Model):
-    __tablename__ = 'association'
+    __tablename__ = "association"
     id = db.Column(db.Integer, primary_key=True)
-    property_id = db.Column(db.Integer, db.ForeignKey('property.id'), nullable=False)
-    value_id = db.Column(db.Integer, db.ForeignKey('value.id'), nullable=False)
-    #property = db.relationship("Property", back_populates="properties")
-    #value = db.relationship("Value", back_populates="values")
+    property_id = db.Column(db.Integer, db.ForeignKey("property.id"), nullable=False)
+    value_id = db.Column(db.Integer, db.ForeignKey("value.id"), nullable=False)
+    # property = db.relationship("Property", back_populates="properties")
+    # value = db.relationship("Value", back_populates="values")
+
 
 class Property(db.Model):
     """
     Represent a property of a shelter.
     """
+
     id = db.Column(db.Integer, primary_key=True)
 
     # relationship
-    shelter_id = db.Column(db.Integer, db.ForeignKey('shelter.id'),
-                            nullable=False)
-    attribute_id = db.Column(db.Integer, db.ForeignKey('attribute.id'),
-                                nullable=False)
+    shelter_id = db.Column(db.Integer, db.ForeignKey("shelter.id"), nullable=False)
+    attribute_id = db.Column(db.Integer, db.ForeignKey("attribute.id"), nullable=False)
     attribute = db.relationship("Attribute", back_populates="properties")
 
-    category_id = db.Column(db.Integer, db.ForeignKey('category.id'),
-                            nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey("category.id"), nullable=False)
     category = db.relationship("Category", back_populates="properties")
 
-    #values = db.relationship("Value", secondary=association_table,
-                            #backref="properties")
+    # values = db.relationship("Value", secondary=association_table,
+    # backref="properties")
     values = db.relationship("Value", secondary="association")
 
     def get_values_as_string(self):

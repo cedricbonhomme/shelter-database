@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # ***** BEGIN LICENSE BLOCK *****
 # This file is part of Shelter Database.
@@ -19,16 +19,19 @@ __license__ = ""
 
 from bootstrap import db
 
+
 class Section(db.Model):
     """
     Represent a section.
     """
+
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(), default='')
+    name = db.Column(db.String(), default="")
 
     # relationships
-    categories = db.relationship('Category', backref='section', lazy='dynamic',
-                           cascade='all, delete-orphan')
+    categories = db.relationship(
+        "Category", backref="section", lazy="dynamic", cascade="all, delete-orphan"
+    )
 
     def __str__(self):
         """
@@ -37,4 +40,4 @@ class Section(db.Model):
         return self.name
 
     def __repr__(self):
-        return '<User %r>' % (self.name)
+        return "<User %r>" % (self.name)

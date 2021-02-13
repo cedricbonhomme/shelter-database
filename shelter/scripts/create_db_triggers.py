@@ -1,8 +1,9 @@
 from bootstrap import db
 
+
 def create_db_triggers():
     db.engine.execute(
-    	"""
+        """
     	CREATE OR REPLACE FUNCTION refresh_materialized_view() RETURNS trigger AS
     	$$
     	BEGIN
@@ -21,5 +22,5 @@ def create_db_triggers():
     	EXECUTE PROCEDURE refresh_materialized_view();
     	
     	REFRESH MATERIALIZED VIEW tsvector
-    	""")
-
+    	"""
+    )

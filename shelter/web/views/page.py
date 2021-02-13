@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # ***** BEGIN LICENSE BLOCK *****
 # This file is part of Shelter Database.
@@ -22,14 +22,17 @@ from flask_babel import get_locale
 
 from web.models import Page
 
-@current_app.route('/page/<string:page_name>', methods=['GET'])
+
+@current_app.route("/page/<string:page_name>", methods=["GET"])
 def recommendations(page_name):
     language_code = get_locale().language
-    page = Page.query.filter(Page.name==page_name,
-                            Page.language_code==language_code).first()
+    page = Page.query.filter(
+        Page.name == page_name, Page.language_code == language_code
+    ).first()
     if not page:
-        page = Page.query.filter(Page.name==page_name,
-                                Page.language_code=='en').first()
+        page = Page.query.filter(
+            Page.name == page_name, Page.language_code == "en"
+        ).first()
         if not page:
-            return render_template('errors/404.html'), 404
-    return render_template('help_pages.html', page=page)
+            return render_template("errors/404.html"), 404
+    return render_template("help_pages.html", page=page)

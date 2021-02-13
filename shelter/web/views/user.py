@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # ***** BEGIN LICENSE BLOCK *****
 # This file is part of Shelter Database.
@@ -25,44 +25,51 @@ from web.models import User
 from web.forms import ProfileForm
 import conf
 
-user_bp = Blueprint('user_bp', __name__, url_prefix='/user')
+user_bp = Blueprint("user_bp", __name__, url_prefix="/user")
 
-@user_bp.route('/profile', methods=['GET', 'POST'])
+
+@user_bp.route("/profile", methods=["GET", "POST"])
 @login_required
 def profile():
-    user = User.query.filter(User.id==current_user.id).first()
+    user = User.query.filter(User.id == current_user.id).first()
     form = ProfileForm()
     # form.set_languages_choice()
 
-    if request.method == 'POST':
+    if request.method == "POST":
         if form.validate():
             # update user
 
-            if form.password.data and \
-                form.password.data == form.password_conf.data:
+            if form.password.data and form.password.data == form.password_conf.data:
                 user.set_password(form.password.data)
 
             form.populate_obj(user)
             db.session.commit()
 
-            flash('User successfully updated', 'success')
-            return redirect(url_for('user_bp.profile'))
+            flash("User successfully updated", "success")
+            return redirect(url_for("user_bp.profile"))
         else:
-            flash('User update failed', 'danger')
+            flash("User update failed", "danger")
             return render_template(
-                    'profile.html', user=user, form=form,
-                    humanitarian_id_auth_uri=conf.HUMANITARIAN_ID_AUTH_URI,
-                    humanitarian_id_app_uri=conf.HUMANITARIAN_ID_APP_URI)
+                "profile.html",
+                user=user,
+                form=form,
+                humanitarian_id_auth_uri=conf.HUMANITARIAN_ID_AUTH_URI,
+                humanitarian_id_app_uri=conf.HUMANITARIAN_ID_APP_URI,
+            )
 
-    if request.method == 'GET':
+    if request.method == "GET":
         form = ProfileForm(obj=user)
         return render_template(
-                'profile.html', user=user, form=form,
-                humanitarian_id_auth_uri=conf.HUMANITARIAN_ID_AUTH_URI,
-                humanitarian_id_app_uri=conf.HUMANITARIAN_ID_APP_URI)
+            "profile.html",
+            user=user,
+            form=form,
+            humanitarian_id_auth_uri=conf.HUMANITARIAN_ID_AUTH_URI,
+            humanitarian_id_app_uri=conf.HUMANITARIAN_ID_APP_URI,
+        )
 
-@user_bp.route('/shelters', methods=['GET'])
+
+@user_bp.route("/shelters", methods=["GET"])
 @login_required
 def shelters():
-    user = User.query.filter(User.id==current_user.id).first()
-    return render_template('shelters.html', shelters=user.shelters)
+    user = User.query.filter(User.id == current_user.id).first()
+    return render_template("shelters.html", shelters=user.shelters)

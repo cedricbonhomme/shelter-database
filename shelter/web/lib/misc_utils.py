@@ -27,18 +27,20 @@ except Exception as e:
 
 import conf
 
+
 def launch_background_process(parameters=[]):
     """
     Fetch the feeds in a new processus.
     The "asyncio" crawler is launched with the manager.
     """
-    cmd = [sys.executable, conf.BASE_DIR + '/manager.py']
+    cmd = [sys.executable, conf.BASE_DIR + "/manager.py"]
     cmd.extend(parameters)
     return subprocess.Popen(cmd, stdout=subprocess.PIPE)
 
+
 def create_pdf(html_code):
-    """
-    """
-    pdf_file = HTML(string=html_code,
-                    base_url=conf.SHELTERS_PICTURES_SERVER_PATH).write_pdf()
+    """"""
+    pdf_file = HTML(
+        string=html_code, base_url=conf.SHELTERS_PICTURES_SERVER_PATH
+    ).write_pdf()
     return pdf_file

@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # ***** BEGIN LICENSE BLOCK *****
 # This file is part of Shelter Database.
@@ -23,12 +23,13 @@ from wtforms import validators, TextField, SubmitField
 
 from web.models import Category
 
+
 class AttributeForm(Form):
     """
     Attribute form.
     """
-    name = TextField("Name",
-        [validators.Required("Please enter a name.")])
+
+    name = TextField("Name", [validators.Required("Please enter a name.")])
     submit = SubmitField("OK")
 
     def validate(self):

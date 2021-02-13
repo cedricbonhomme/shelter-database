@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # ***** BEGIN LICENSE BLOCK *****
 # This file is part of Shelter Database.
@@ -18,8 +18,16 @@ __copyright__ = "Copyright 2016 Luxembourg Institute of Science and Technology"
 __license__ = ""
 
 from collections import defaultdict
-from flask import request, flash, render_template, url_for, \
-                    redirect, current_app, send_from_directory, jsonify
+from flask import (
+    request,
+    flash,
+    render_template,
+    url_for,
+    redirect,
+    current_app,
+    send_from_directory,
+    jsonify,
+)
 from flask_login import current_user
 from flask_babel import get_locale
 
@@ -27,177 +35,226 @@ import conf
 from bootstrap import db
 from web.models import Shelter, Attribute, Property, User, ShelterPicture
 
+
 def tree():
     return defaultdict(tree)
+
 
 #
 # Default errors
 #
 @current_app.errorhandler(404)
 def page_not_found(e):
-    return render_template('errors/404.html'), 404
+    return render_template("errors/404.html"), 404
+
 
 @current_app.errorhandler(405)
 def method_not_allowed(e):
-    return render_template('errors/405.html'), 405
+    return render_template("errors/405.html"), 405
+
 
 @current_app.errorhandler(500)
 def internal_server_error(e):
-    return render_template('errors/500.html'), 500
+    return render_template("errors/500.html"), 500
+
 
 @current_app.errorhandler(403)
 def authentication_failed(e):
-    flash('You do not have enough rights.', 'danger')
-    return redirect(url_for('join'))
+    flash("You do not have enough rights.", "danger")
+    return redirect(url_for("join"))
+
 
 @current_app.errorhandler(401)
 def authentication_required(e):
-    flash('Authenticated required.', 'info')
-    return redirect(url_for('join'))
+    flash("Authenticated required.", "info")
+    return redirect(url_for("join"))
+
 
 #
 # Views.
 #
 
-@current_app.route('/', methods=['GET'])
-def index():
-    shelters = Shelter.query.filter(Shelter.is_published==True).count()
-    return render_template('index.html', num_shelters=shelters)
 
-@current_app.route('/map', methods=['GET'])
+@current_app.route("/", methods=["GET"])
+def index():
+    shelters = Shelter.query.filter(Shelter.is_published == True).count()
+    return render_template("index.html", num_shelters=shelters)
+
+
+@current_app.route("/map", methods=["GET"])
 def map():
     """
     This view displays the map.
     """
-    climate_zones = Attribute.query.filter(Attribute.name=="Climate zone").\
-                                first().associated_values
-    zones = Attribute.query.filter(Attribute.name=="Zone").\
-                                first().associated_values
-    disasters = Attribute.query.filter(
-                    Attribute.name=="Associated disaster / Immediate cause").\
-                                first().associated_values
-    materials = Attribute.query.filter(
-                    Attribute.name=="Foundation material").\
-                                first().associated_values
-    return render_template('map.html',
-                            geoserver_url = conf.GEOSERVER_URL,
-                            climate_zones=climate_zones,
-                            zones=zones,
-                            disasters=disasters,
-                            materials=materials)
+    climate_zones = (
+        Attribute.query.filter(Attribute.name == "Climate zone")
+        .first()
+        .associated_values
+    )
+    zones = Attribute.query.filter(Attribute.name == "Zone").first().associated_values
+    disasters = (
+        Attribute.query.filter(
+            Attribute.name == "Associated disaster / Immediate cause"
+        )
+        .first()
+        .associated_values
+    )
+    materials = (
+        Attribute.query.filter(Attribute.name == "Foundation material")
+        .first()
+        .associated_values
+    )
+    return render_template(
+        "map.html",
+        geoserver_url=conf.GEOSERVER_URL,
+        climate_zones=climate_zones,
+        zones=zones,
+        disasters=disasters,
+        materials=materials,
+    )
 
-@current_app.route('/shelters_for_map', methods=['GET'])
+
+@current_app.route("/shelters_for_map", methods=["GET"])
 def shelters_for_map():
     result = tree()
 
     latitude_properties = Property.query.filter(
-                            Property.attribute.has(name="GPS Latitude"),
-                            )
+        Property.attribute.has(name="GPS Latitude"),
+    )
     longitude_properties = Property.query.filter(
-                            Property.attribute.has(name="GPS Longitude"),
-                            )
+        Property.attribute.has(name="GPS Longitude"),
+    )
     if not current_user.is_authenticated:
         latitude_properties = latitude_properties.filter(
-                                Property.shelter.has(is_published = True))
+            Property.shelter.has(is_published=True)
+        )
         longitude_properties = longitude_properties.filter(
-                                Property.shelter.has(is_published = True))
+            Property.shelter.has(is_published=True)
+        )
 
     for latitude_property in latitude_properties:
-        result[latitude_property.shelter_id]["latitude"] = latitude_property.values[0].name
+        result[latitude_property.shelter_id]["latitude"] = latitude_property.values[
+            0
+        ].name
     for longitude_property in longitude_properties:
-        result[longitude_property.shelter_id]["longitude"] = longitude_property.values[0].name
+        result[longitude_property.shelter_id]["longitude"] = longitude_property.values[
+            0
+        ].name
 
     if request.args:
         result_copy = result.copy()
         for shelter_id in result_copy:
-            shelter = Shelter.query.filter(Shelter.id==shelter_id).first()
+            shelter = Shelter.query.filter(Shelter.id == shelter_id).first()
 
             for attribute_name, value in request.args.items():
                 if not value:
                     continue
 
-                values = [current_value.name for current_value in \
-                    shelter.get_values_of_attribute(attribute_name=attribute_name)]
+                values = [
+                    current_value.name
+                    for current_value in shelter.get_values_of_attribute(
+                        attribute_name=attribute_name
+                    )
+                ]
 
                 if value not in values:
                     result.pop(shelter_id, None)
                     break
 
     for shelter_id in result:
-        shelter = Shelter.query.filter(Shelter.id==shelter_id).first()
-        result[shelter_id]["name"] = \
-            shelter.get_values_of_attribute(attribute_name="Name of shelter")[0].name
-        result[shelter_id]["city"] = \
-            shelter.get_values_of_attribute(attribute_name="City / Village")[0].name
-        result[shelter_id]["id"] = \
-            shelter.get_values_of_attribute(attribute_name="ID")[0].name
+        shelter = Shelter.query.filter(Shelter.id == shelter_id).first()
+        result[shelter_id]["name"] = shelter.get_values_of_attribute(
+            attribute_name="Name of shelter"
+        )[0].name
+        result[shelter_id]["city"] = shelter.get_values_of_attribute(
+            attribute_name="City / Village"
+        )[0].name
+        result[shelter_id]["id"] = shelter.get_values_of_attribute(attribute_name="ID")[
+            0
+        ].name
         result[shelter_id]["isCommercial"] = shelter.is_commercial
 
     return jsonify(result)
 
-@current_app.route('/dashboard', methods=['GET'])
+
+@current_app.route("/dashboard", methods=["GET"])
 def dashboard():
     # return render_template('dashboard0.html')
-    return render_template('dashboard.html')
+    return render_template("dashboard.html")
 
-@current_app.route('/shelters', methods=['GET'])
+
+@current_app.route("/shelters", methods=["GET"])
 def shelters():
-    shelters = Shelter.query.filter(Shelter.is_published==True).all()
-    return render_template('shelters.html', shelters=shelters)
+    shelters = Shelter.query.filter(Shelter.is_published == True).all()
+    return render_template("shelters.html", shelters=shelters)
 
 
-@current_app.route('/shelter/<int:shelter_id>', methods=['GET'])
+@current_app.route("/shelter/<int:shelter_id>", methods=["GET"])
 def shelter(shelter_id):
     language_code = get_locale().language
     shelter = Shelter.query.filter(Shelter.id == shelter_id).first()
     user = User.query.filter(User.id == shelter.user_id).first()
-    images = ShelterPicture.query.filter(
-            ShelterPicture.shelter_id == shelter_id)
+    images = ShelterPicture.query.filter(ShelterPicture.shelter_id == shelter_id)
     og_img = None
     for image in images:
         if image.is_main_picture:
-            og_img = request.url_root+'static/pictures/shelters/' +\
-                     str(shelter_id)+'/'+image.file_name
+            og_img = (
+                request.url_root
+                + "static/pictures/shelters/"
+                + str(shelter_id)
+                + "/"
+                + image.file_name
+            )
             break
     return render_template(
-       'shelter.html', shelter_id=shelter_id,
-       shelter=shelter, og_img=og_img,
-       language=language_code, user_email=user.email,
-       user_name=user.name, user_id=user.id,
-       user_h_id=user.h_id,
-       humanitarian_id_app_uri=conf.HUMANITARIAN_ID_APP_URI,
-       user_image=user.get_image_url())
+        "shelter.html",
+        shelter_id=shelter_id,
+        shelter=shelter,
+        og_img=og_img,
+        language=language_code,
+        user_email=user.email,
+        user_name=user.name,
+        user_id=user.id,
+        user_h_id=user.h_id,
+        humanitarian_id_app_uri=conf.HUMANITARIAN_ID_APP_URI,
+        user_image=user.get_image_url(),
+    )
 
 
-@current_app.route('/stats', methods=['GET'])
+@current_app.route("/stats", methods=["GET"])
 def stats():
-    return render_template('stats.html')
+    return render_template("stats.html")
 
-@current_app.route('/help', methods=['GET'])
+
+@current_app.route("/help", methods=["GET"])
 def help():
-    return render_template('help.html')
-	
-@current_app.route('/termsofservice', methods=['GET'])
-def termsofservice():
-    return render_template('termsofservice.html')
+    return render_template("help.html")
 
-@current_app.route('/contribute', methods=['GET'])
+
+@current_app.route("/termsofservice", methods=["GET"])
+def termsofservice():
+    return render_template("termsofservice.html")
+
+
+@current_app.route("/contribute", methods=["GET"])
 def contribute():
     """
     List of contributors.
     """
-    return render_template('contribute.html')
+    return render_template("contribute.html")
 
-@current_app.route('/contributors', methods=['GET'])
+
+@current_app.route("/contributors", methods=["GET"])
 def contributors():
     """
     List of contributors.
     """
-    return render_template('contributors.html')
+    return render_template("contributors.html")
 
-@current_app.route('/public/<path:filename>', methods=['GET'])
+
+@current_app.route("/public/<path:filename>", methods=["GET"])
 def public_file(filename):
     """
     Exposes public files (media uploaded by users, etc.).
     """
-    return send_from_directory(current_app.config['PUBLIC_PATH'], filename)
+    return send_from_directory(current_app.config["PUBLIC_PATH"], filename)

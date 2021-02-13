@@ -22,12 +22,13 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-#from postmark import PMMail
+# from postmark import PMMail
 
 import conf
 from web.decorators import async_f
 
 logger = logging.getLogger(__name__)
+
 
 def send(*args, **kwargs):
     """
@@ -39,36 +40,36 @@ def send(*args, **kwargs):
     else:
         send_smtp(**kwargs)
 
+
 @async_f
 def send_smtp(to="", bcc="", subject="", plaintext=""):
     """
     Send an email.
     """
     # Create message container - the correct MIME type is multipart/alternative.
-    msg = MIMEMultipart('alternative')
-    msg['Subject'] = subject
-    msg['From'] = conf.NOTIFICATION_EMAIL
-    msg['To'] = to
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = subject
+    msg["From"] = conf.NOTIFICATION_EMAIL
+    msg["To"] = to
     if bcc != "":
-        msg['BCC'] = bcc
+        msg["BCC"] = bcc
 
     # Record the MIME type of text/plain.
-    part1 = MIMEText(plaintext, 'plain', 'utf-8')
+    part1 = MIMEText(plaintext, "plain", "utf-8")
 
     # Attach parts into message container.
     # According to RFC 2046, the last part of a multipart message, in this case
     # the HTML message, is best and preferred.
     msg.attach(part1)
 
-    with smtplib.SMTP(host=conf.NOTIFICATION_HOST,
-                      port=conf.NOTIFICATION_PORT) as smtp:
+    with smtplib.SMTP(host=conf.NOTIFICATION_HOST, port=conf.NOTIFICATION_PORT) as smtp:
         smtp.ehlo()
         if conf.NOTIFICATION_STARTTLS:
             smtp.starttls()
         smtp.ehlo()
         if conf.NOTIFICATION_PASSWORD != "":
             smtp.login(conf.NOTIFICATION_USERNAME, conf.NOTIFICATION_PASSWORD)
-        smtp.sendmail(conf.NOTIFICATION_EMAIL, [msg['To']], msg.as_string())
+        smtp.sendmail(conf.NOTIFICATION_EMAIL, [msg["To"]], msg.as_string())
 
 
 def send_postmark(to="", bcc="", subject="", plaintext=""):
@@ -77,10 +78,12 @@ def send_postmark(to="", bcc="", subject="", plaintext=""):
     Heroku.
     """
     try:
-        message = PMMail(api_key = conf.POSTMARK_API_KEY,
-                        subject = subject,
-                        sender = conf.NOTIFICATION_EMAIL,
-                        text_body = plaintext)
+        message = PMMail(
+            api_key=conf.POSTMARK_API_KEY,
+            subject=subject,
+            sender=conf.NOTIFICATION_EMAIL,
+            text_body=plaintext,
+        )
         message.to = to
         if bcc != "":
             message.bcc = bcc

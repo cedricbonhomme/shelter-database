@@ -8,7 +8,7 @@ def slugify(text, delim="_"):
     """Generates an slightly worse ASCII-only slug."""
     result = []
     for word in _punct_re.split(text.lower()):
-        word = normalize('NFKD', word)
+        word = normalize("NFKD", word)
         if word:
             result.append(word)
     return str(delim.join(result))

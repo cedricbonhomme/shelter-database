@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # ***** BEGIN LICENSE BLOCK *****
 # This file is part of Shelter Database.
@@ -19,17 +19,24 @@ __license__ = ""
 
 from flask_wtf import Form
 from flask import url_for, redirect
-from wtforms import validators, TextField, PasswordField, BooleanField, \
-                    SubmitField, HiddenField
+from wtforms import (
+    validators,
+    TextField,
+    PasswordField,
+    BooleanField,
+    SubmitField,
+    HiddenField,
+)
 
 from web.models import Category
+
 
 class CategoryForm(Form):
     """
     Category form.
     """
-    name = TextField("Name",
-        [validators.Required("Please enter a name.")])
+
+    name = TextField("Name", [validators.Required("Please enter a name.")])
     submit = SubmitField("OK")
 
     def validate(self):

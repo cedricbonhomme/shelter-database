@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # ***** BEGIN LICENSE BLOCK *****
 # This file is part of Shelter Database.
@@ -19,11 +19,13 @@ __license__ = ""
 
 from bootstrap import db
 
+
 class Page(db.Model):
     """
     Represent a page.
     """
+
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(), default='')
-    content = db.Column(db.String(), default='')
-    language_code = db.Column(db.String(), default='')
+    name = db.Column(db.String(), default="")
+    content = db.Column(db.String(), default="")
+    language_code = db.Column(db.String(), default="")

@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # ***** BEGIN LICENSE BLOCK *****
 # This file is part of Shelter Database.
@@ -34,38 +34,65 @@ from .page import Page
 from .translation import Translation
 
 
-__all__ = ['User', 'Shelter', 'Section', 'Property', 'Category', 'Attribute',
-            'Value', 'Page', 'Translation', 'AttributePicture',
-            'ShelterPicture', 'ShelterDocument', 'Association', 'Tsvector']
+__all__ = [
+    "User",
+    "Shelter",
+    "Section",
+    "Property",
+    "Category",
+    "Attribute",
+    "Value",
+    "Page",
+    "Translation",
+    "AttributePicture",
+    "ShelterPicture",
+    "ShelterDocument",
+    "Association",
+    "Tsvector",
+]
 
 import os
 
 from sqlalchemy.engine import reflection
 from sqlalchemy.schema import (
-        MetaData,
-        Table,
-        DropTable,
-        ForeignKeyConstraint,
-        DropConstraint)
+    MetaData,
+    Table,
+    DropTable,
+    ForeignKeyConstraint,
+    DropConstraint,
+)
+
 
 def mappers(*args):
     from sqlalchemy.orm import class_mapper
+
     return [class_mapper(x) for x in args]
+
 
 def uml_graph(db):
     """Generate a UML diagram from the models."""
     import sqlalchemy_schemadisplay as sasd
 
     graph = sasd.create_uml_graph(
-                        mappers(User, Shelter, Section, Property,
-                                Category, Attribute, Value,
-                                Page, Translation,
-                                ShelterPicture, ShelterDocument,
-                                AttributePicture),
-                        show_operations=False,
-                        show_multiplicity_one=True
+        mappers(
+            User,
+            Shelter,
+            Section,
+            Property,
+            Category,
+            Attribute,
+            Value,
+            Page,
+            Translation,
+            ShelterPicture,
+            ShelterDocument,
+            AttributePicture,
+        ),
+        show_operations=False,
+        show_multiplicity_one=True,
     )
-    graph.write_png('uml_graph.png') # write out the file
+    graph.write_png("uml_graph.png")  # write out the file
+
 
 def db_empty(db):
     "Will drop every datas stocked in db."
@@ -89,9 +116,9 @@ def db_empty(db):
     for table_name in inspector.get_table_names():
         fks = []
         for fk in inspector.get_foreign_keys(table_name):
-            if not fk['name']:
+            if not fk["name"]:
                 continue
-            fks.append(ForeignKeyConstraint((), (), name=fk['name']))
+            fks.append(ForeignKeyConstraint((), (), name=fk["name"]))
         t = Table(table_name, metadata, *fks)
         tbs.append(t)
         all_fks.extend(fks)
@@ -103,6 +130,7 @@ def db_empty(db):
         conn.execute(DropTable(table))
 
     trans.commit()
+
 
 def db_init(db):
     "Will create the database from conf parameters."

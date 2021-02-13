@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # ***** BEGIN LICENSE BLOCK *****
 # This file is part of Shelter Database.
@@ -19,23 +19,34 @@ __license__ = ""
 
 from flask_wtf import Form
 from flask import url_for, redirect
-from wtforms import validators, TextField, PasswordField, SelectField, \
-                    SubmitField, HiddenField
+from wtforms import (
+    validators,
+    TextField,
+    PasswordField,
+    SelectField,
+    SubmitField,
+    HiddenField,
+)
 from flask_wtf.html5 import EmailField
 from sqlalchemy import distinct
 
 from bootstrap import db
 from web.models import User, Translation
 
+
 class ProfileForm(Form):
     """
     Edit user own information.
     """
-    name = TextField("Nickname",
-            [validators.Required("Please enter your nickname.")])
-    email = EmailField("Email",
-               [validators.Length(min=6, max=35),
-                validators.Required("Please enter your email.")])
+
+    name = TextField("Nickname", [validators.Required("Please enter your nickname.")])
+    email = EmailField(
+        "Email",
+        [
+            validators.Length(min=6, max=35),
+            validators.Required("Please enter your email."),
+        ],
+    )
     organization = TextField("Organization")
     # preferred_language = SelectField("Preferred language")
     password = PasswordField("Shelter-database password")
@@ -58,8 +69,10 @@ class ProfileForm(Form):
             self.password_conf.errors.append(message)
             validated = False
         if self.name.data != User.make_valid_name(self.name.data):
-            self.name.errors.append('This nickname has '
-                    'invalid characters. Please use letters, numbers, dots and'
-                    ' underscores only.')
+            self.name.errors.append(
+                "This nickname has "
+                "invalid characters. Please use letters, numbers, dots and"
+                " underscores only."
+            )
             validated = False
         return validated

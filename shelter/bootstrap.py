@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # ***** BEGIN LICENSE BLOCK *****
 # This file is part of Shelter Database.
@@ -34,11 +34,13 @@ from flask_assets import Environment, Bundle
 # Create Flask app
 def _force_https(app):
     def wrapper(environ, start_response):
-        environ['wsgi.url_scheme'] = 'https'
+        environ["wsgi.url_scheme"] = "https"
         return app(environ, start_response)
+
     return wrapper
 
-app = Flask('web')
+
+app = Flask("web")
 
 # Force https
 if conf.WEBSERVER_HTTPS:
@@ -49,10 +51,11 @@ assets = Environment(app)
 logger = logging.getLogger("")
 logger.setLevel(conf.LOG_LEVEL)
 handler = logging.handlers.RotatingFileHandler(
-            conf.LOG_PATH,
-            maxBytes=3000000, backupCount=2)
+    conf.LOG_PATH, maxBytes=3000000, backupCount=2
+)
 formatter = logging.Formatter(
-    '[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s')
+    "[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s"
+)
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 logging.getLogger().addHandler(logging.StreamHandler())
@@ -62,26 +65,26 @@ logging.debug("started app")
 
 # Create a random secrey key so we can use sessions
 if conf.WEBSERVER_SECRET_KEY:
-    app.config['SECRET_KEY'] = conf.WEBSERVER_SECRET_KEY
+    app.config["SECRET_KEY"] = conf.WEBSERVER_SECRET_KEY
 else:
-    app.config['SECRET_KEY'] = os.urandom(12)
+    app.config["SECRET_KEY"] = os.urandom(12)
 
 app.debug = conf.LOG_LEVEL <= logging.DEBUG
 
-app.config['ASSETS_DEBUG'] = "merge"
+app.config["ASSETS_DEBUG"] = "merge"
 
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-app.config['SQLALCHEMY_DATABASE_URI'] = conf.SQLALCHEMY_DATABASE_URI
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
+app.config["SQLALCHEMY_DATABASE_URI"] = conf.SQLALCHEMY_DATABASE_URI
 
-app.config['PUBLIC_PATH'] = conf.PUBLIC_PATH
+app.config["PUBLIC_PATH"] = conf.PUBLIC_PATH
 
-app.config['JSON_AS_ASCII'] = False
+app.config["JSON_AS_ASCII"] = False
 
 db = SQLAlchemy(app)
 
 # Set up thumbnail handling
-app.config['MEDIA_FOLDER'] = conf.SHELTERS_PICTURES_SERVER_PATH
-app.config['MEDIA_URL'] = conf.SHELTERS_PICTURES_SITE_PATH
+app.config["MEDIA_FOLDER"] = conf.SHELTERS_PICTURES_SERVER_PATH
+app.config["MEDIA_URL"] = conf.SHELTERS_PICTURES_SITE_PATH
 
 # Create the Flask-Restless API manager.
 manager = flask_restless.APIManager(app, flask_sqlalchemy_db=db)
@@ -89,27 +92,31 @@ manager = flask_restless.APIManager(app, flask_sqlalchemy_db=db)
 # Jinja filters
 from flask_babel import Babel, format_datetime, get_locale
 from web.models import Translation
+
 babel = Babel(app)
-def translate(original, language_code=''):
-    if language_code == '':
+
+
+def translate(original, language_code=""):
+    if language_code == "":
         language_code = get_locale().language
     translation = Translation.query.filter(
-                            Translation.original==original,
-                            Translation.language_code==language_code,
-                            ).first()
+        Translation.original == original,
+        Translation.language_code == language_code,
+    ).first()
     if translation:
         return translation.translated
     else:
         return original
 
 
-app.jinja_env.filters['translate'] = translate
-app.jinja_env.filters['datetime'] = format_datetime
+app.jinja_env.filters["translate"] = translate
+app.jinja_env.filters["datetime"] = format_datetime
 app.jinja_env.globals.update(hid_auth_uri=conf.HUMANITARIAN_ID_AUTH_URI)
 
 
 def populate_g():
     from flask import g
+
     g.db = db
     g.app = app
     g.babel = babel

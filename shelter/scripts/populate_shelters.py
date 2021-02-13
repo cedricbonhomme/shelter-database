@@ -1,17 +1,18 @@
 #! /usr/bin/python
-#-*- coding:utf-8 -*
+# -*- coding:utf-8 -*
 
 import csv
 
 from web import models
 from bootstrap import db
 
+
 def populate_shelters(shelters_owner, csv_file):
 
-    user = models.User.query.filter(models.User.name==shelters_owner).first()
+    user = models.User.query.filter(models.User.name == shelters_owner).first()
 
-    with open(csv_file, newline='', encoding='utf-8') as csvfile:
-        shelters = csv.reader(csvfile, delimiter=',')
+    with open(csv_file, newline="", encoding="utf-8") as csvfile:
+        shelters = csv.reader(csvfile, delimiter=",")
 
         for index, row in enumerate(shelters):
             if index == 0:
@@ -35,32 +36,34 @@ def populate_shelters(shelters_owner, csv_file):
             # Association of the attribute of the new shelter
             for index, shelter_attributes in enumerate(row):
                 if shelter_attributes:
-                    #print(category_level_2[index])
+                    # print(category_level_2[index])
                     attribute = models.Attribute.query.filter(
-                            models.Attribute.name==attributes[index],
-                            models.Attribute.category.has(name=category_level_2[index])).first()
+                        models.Attribute.name == attributes[index],
+                        models.Attribute.category.has(name=category_level_2[index]),
+                    ).first()
                     if not attribute:
                         continue
-                    #print("{} -> {}".format(elem, attribute.name))
-
+                    # print("{} -> {}".format(elem, attribute.name))
 
                     values = []
                     for value in shelter_attributes.split(";"):
                         current_value = value.strip()
                         if not attribute.free_text:
                             value_obj = models.Value.query.filter(
-                                    models.Value.name==current_value).first()
+                                models.Value.name == current_value
+                            ).first()
                             if not value_obj:
-                                continue #TODO: check
+                                continue  # TODO: check
 
                         else:
                             value_obj = models.Value.query.filter(
-                                    models.Value.name == current_value,
-                                    models.Value.attribute_id == attribute.id)\
-                                    .first()
+                                models.Value.name == current_value,
+                                models.Value.attribute_id == attribute.id,
+                            ).first()
                             if not value_obj:
-                                value_obj = models.Value(name=current_value,
-                                                        attribute_id=attribute.id)
+                                value_obj = models.Value(
+                                    name=current_value, attribute_id=attribute.id
+                                )
                             db.session.add(value_obj)
                             attribute.associated_values.append(value_obj)
                             db.session.commit()
@@ -68,11 +71,13 @@ def populate_shelters(shelters_owner, csv_file):
                         values.append(value_obj)
 
                     if values:
-                        shelter_property = models.Property(shelter_id=shelter.id,
-                                                attribute_id=attribute.id,
-                                                attribute=attribute,
-                                                category_id=attribute.category_id,
-                                                category=attribute.category,
-                                                values=values)
+                        shelter_property = models.Property(
+                            shelter_id=shelter.id,
+                            attribute_id=attribute.id,
+                            attribute=attribute,
+                            category_id=attribute.category_id,
+                            category=attribute.category,
+                            values=values,
+                        )
                         db.session.add(shelter_property)
                         db.session.commit()

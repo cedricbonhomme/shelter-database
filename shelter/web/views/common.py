@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # ***** BEGIN LICENSE BLOCK *****
 # This file is part of Shelter Database.
@@ -15,20 +15,34 @@ from collections import defaultdict
 from functools import wraps
 from flask import current_app, Response
 from flask_login import login_user
-from flask_principal import (Identity, Permission, RoleNeed,
-                                 session_identity_loader, identity_changed)
+from flask_principal import (
+    Identity,
+    Permission,
+    RoleNeed,
+    session_identity_loader,
+    identity_changed,
+)
 from sqlalchemy import func
 
-#from web.lib.utils import default_handler
-from web.models import (Category, Property, Attribute, ShelterPicture,
-                        ShelterDocument, Shelter, Section)
+# from web.lib.utils import default_handler
+from web.models import (
+    Category,
+    Property,
+    Attribute,
+    ShelterPicture,
+    ShelterDocument,
+    Shelter,
+    Section,
+)
 
-admin_role = RoleNeed('admin')
+admin_role = RoleNeed("admin")
 admin_permission = Permission(admin_role)
+
 
 def jsonify(func):
     """Will cast results of func as a result, and try to extract
     a status_code for the Response object"""
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         status_code = 200
@@ -37,8 +51,12 @@ def jsonify(func):
             return result
         elif isinstance(result, tuple):
             result, status_code = result
-        return Response(json.dumps(result, default=scoped_default_handler()),
-                        mimetype='application/json', status=status_code)
+        return Response(
+            json.dumps(result, default=scoped_default_handler()),
+            mimetype="application/json",
+            status=status_code,
+        )
+
     return wrapper
 
 
@@ -48,13 +66,15 @@ def login_user_bundle(user):
     session_identity_loader()
     # eventually update the last_seen field
 
+
 def load_shelter_info(shelter_id, section_name):
-    shelter = Shelter.query.filter(Shelter.id==shelter_id).first()
+    shelter = Shelter.query.filter(Shelter.id == shelter_id).first()
     if not shelter:
         raise Exception("No such shelter")
 
     section = Section.query.filter(
-            func.lower(Section.name)==func.lower(section_name.replace('-', ' '))).first()
+        func.lower(Section.name) == func.lower(section_name.replace("-", " "))
+    ).first()
     if not section:
         raise Exception("No such section")
 
@@ -64,11 +84,12 @@ def load_shelter_info(shelter_id, section_name):
 
     for category in section.categories:
 
-        if category.name == 'Walls & frame':
+        if category.name == "Walls & frame":
             superstructure_type = Property.query.filter(
-                    Property.shelter_id==shelter.id,
-                    Property.category.has(name="Walls & Frame"),
-                    Property.category.has(Category.parent_id!=None)).first()
+                Property.shelter_id == shelter.id,
+                Property.category.has(name="Walls & Frame"),
+                Property.category.has(Category.parent_id != None),
+            ).first()
             if superstructure_type:
                 superstructure_type_string = superstructure_type.get_values_as_string()
             else:
@@ -77,26 +98,31 @@ def load_shelter_info(shelter_id, section_name):
             superstructure_type_string = ""
 
         for sub_category in category.sub_categories:
-            if category.name == 'Walls & frame' and \
-                sub_category.name != 'Walls & Frame' and \
-                superstructure_type_string.lower()!=sub_category.name.lower():
+            if (
+                category.name == "Walls & frame"
+                and sub_category.name != "Walls & Frame"
+                and superstructure_type_string.lower() != sub_category.name.lower()
+            ):
                 continue
 
             categories[sub_category.name].extend(
                 Property.query.filter(
-                                    Property.shelter_id==shelter.id,
-                                    Property.category.has(name=sub_category.name))
-                                .join(Attribute)
-                                .order_by(Attribute.display_position.asc())
-                                )
+                    Property.shelter_id == shelter.id,
+                    Property.category.has(name=sub_category.name),
+                )
+                .join(Attribute)
+                .order_by(Attribute.display_position.asc())
+            )
             pictures[sub_category.name].extend(
                 ShelterPicture.query.filter(
-                                    ShelterPicture.shelter_id==shelter.id,
-                                    ShelterPicture.category_id==sub_category.id)
-                                )
+                    ShelterPicture.shelter_id == shelter.id,
+                    ShelterPicture.category_id == sub_category.id,
+                )
+            )
             documents[sub_category.name].extend(
                 ShelterDocument.query.filter(
-                                    ShelterDocument.shelter_id==shelter.id,
-                                    ShelterDocument.category_id==sub_category.id)
-                                )
+                    ShelterDocument.shelter_id == shelter.id,
+                    ShelterDocument.category_id == sub_category.id,
+                )
+            )
     return shelter, section, categories, pictures, documents

@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # ***** BEGIN LICENSE BLOCK *****
 # This file is part of Shelter Database.
@@ -23,10 +23,12 @@ from bootstrap import db
 
 from web.models import Value
 
+
 class Attribute(db.Model):
     """
     Represent an attribute.
     """
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(), nullable=False)
     uniqueid = db.Column(db.String(), nullable=False)
@@ -35,21 +37,29 @@ class Attribute(db.Model):
     is_editable = db.Column(db.Boolean(), default=True)
     is_mandatory = db.Column(db.Boolean(), default=False)
     user_can_add_values = db.Column(db.Boolean(), default=False)
-    type = db.Column(db.String(), default='')
+    type = db.Column(db.String(), default="")
     display_position = db.Column(db.Integer, default=0)
 
     # relationships
-    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey("category.id"), nullable=False)
     category = db.relationship("Category", back_populates="attributes")
 
-    associated_values = db.relationship('Value', backref='attribute', lazy='dynamic',
-                           cascade='all, delete-orphan',
-                           order_by=asc(Value.name))
+    associated_values = db.relationship(
+        "Value",
+        backref="attribute",
+        lazy="dynamic",
+        cascade="all, delete-orphan",
+        order_by=asc(Value.name),
+    )
 
     properties = db.relationship("Property", back_populates="attribute")
 
-    pictures = db.relationship('AttributePicture', backref='attribute', lazy='dynamic',
-                           cascade='all, delete-orphan')
+    pictures = db.relationship(
+        "AttributePicture",
+        backref="attribute",
+        lazy="dynamic",
+        cascade="all, delete-orphan",
+    )
 
     def __str__(self):
         """

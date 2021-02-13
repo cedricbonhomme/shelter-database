@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # ***** BEGIN LICENSE BLOCK *****
 # This file is part of Shelter Database.
@@ -33,9 +33,10 @@ class User(db.Model, UserMixin):
     """
     Represent a user.
     """
+
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(), unique=True, nullable=False)
-    name = db.Column(db.String(), default='')
+    name = db.Column(db.String(), default="")
     pwdhash = db.Column(db.String(), nullable=False)
     h_id = db.Column(db.String(), nullable=True)
     image = db.Column(JSON, nullable=True)
@@ -44,16 +45,20 @@ class User(db.Model, UserMixin):
     last_seen = db.Column(db.DateTime(), default=datetime.now)
     is_admin = db.Column(db.Boolean(), default=False)
     is_active = db.Column(db.Boolean(), default=False)
-    preferred_language = db.Column(db.String(), default='en')
+    preferred_language = db.Column(db.String(), default="en")
 
     # relationships
-    shelters = db.relationship('Shelter', backref='responsible', lazy='dynamic',
-                           cascade='all, delete-orphan',
-                           order_by=desc('Shelter.id'))
+    shelters = db.relationship(
+        "Shelter",
+        backref="responsible",
+        lazy="dynamic",
+        cascade="all, delete-orphan",
+        order_by=desc("Shelter.id"),
+    )
 
     @staticmethod
     def make_valid_name(name):
-        return re.sub('[^a-zA-Z0-9_\.]', '', name)
+        return re.sub("[^a-zA-Z0-9_\.]", "", name)
 
     def get_id(self):
         """
@@ -88,15 +93,16 @@ class User(db.Model, UserMixin):
         if self.image and isinstance(self.image, list):
             for image in self.image:
                 # Return url of type url among images
-                if image.get('type', None) == 'URL':
-                    return image.get('url')
+                if image.get("type", None) == "URL":
+                    return image.get("url")
         # For new api data (just single url)
         if self.image and len(self.image):
             return self.image
         # if h_id is only present, then image url can be
         if self.h_id:
-            image = conf.HUMANITARIAN_ID_AUTH_URI+"/assets/pictures/"\
-                    + self.h_id + ".jpg"
+            image = (
+                conf.HUMANITARIAN_ID_AUTH_URI + "/assets/pictures/" + self.h_id + ".jpg"
+            )
             r = requests.get(image)
             if r.status_code == 200:
                 self.image = image
@@ -115,4 +121,4 @@ class User(db.Model, UserMixin):
         return self.name
 
     def __repr__(self):
-        return '<User %r>' % (self.name)
+        return "<User %r>" % (self.name)
